@@ -12,11 +12,15 @@ const routes = [
   {
     path: '/home',
     name: 'Home',
-    component: () => import( '../views/general/Home.vue')
+    component: () => import( '../views/createur/Home.vue')
   },
   {
     path: '/loading',
     component: () => import('../views/general/Loading.vue')
+  },
+  {
+    path: '/loadingadmin',
+    component: () => import('../views/general/LoadingAdmin.vue')
   },
   {
     path: '/evenement',
@@ -24,7 +28,7 @@ const routes = [
   },
   {
     path: '/profil',
-    component: () => import('../views/general/Profil.vue')
+    component: () => import('../views/createur/Profil.vue')
   },
   {
     path: '/invitation',
@@ -37,6 +41,40 @@ const routes = [
   {
     path: '/participant',
     component: () => import('../views/createur/Participant.vue')
+  },
+  {
+    path: '/successcc',
+    component: () => import('../views/Animations/SuccessCompteCree.vue')
+  },
+  {
+    path: '/errorcc',
+    component: () => import('../views/Animations/ErrorCompteCree.vue')
+  },
+  {
+    path: '/successmp',
+    component: () => import('../views/Animations/SuccessModifieProfil.vue')
+  },
+  {
+    path: '/errormp',
+    component: () => import('../views/Animations/ErrorModifierProfil.vue')
+  },
+  {
+    path: '/successev',
+    component: () => import('../views/Animations/SuccessEvCreer.vue')
+  },
+  {
+    path: '/errorev',
+    component: () => import('../views/Animations/ErrorEvCreer.vue')
+  },
+  {
+    path: '/gestionEvenement',
+    name: 'gestionEvenement',
+    component: () => import( '../views/gestionnaire/GestionEvenement.vue')
+  },
+  {
+    path: '/gestionCompte',
+    name: 'gestionCompte',
+    component: () => import( '../views/gestionnaire/GestionCompte.vue')
   },
 ]
 

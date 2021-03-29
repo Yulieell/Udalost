@@ -8,14 +8,34 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import $ from 'jquery'
 
+import axios from 'axios';
+
+window.api = axios.create({
+  baseURL: "https://docketu.iutnc.univ-lorraine.fr:10643/",
+  withCredentials: true,
+});
+
+axios.interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  if (401 === error.response.status) {
+      console.log("a error")
+  } else {
+      return Promise.reject(error);
+  }
+});
+
+import $ from 'jquery'
+//axios.defaults.withCredentials = true
 
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
 Vue.use(SuiVue);
 Vue.config.productionTip = false
+
+Vue.prototype.$bus = new Vue();
 
 
 new Vue({

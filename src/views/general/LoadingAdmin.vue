@@ -2,7 +2,7 @@
   <div>
     <div class="div">
       <div class="image">
-        <h4>Bienvenu(e) {{fullname}} à</h4>
+        <h4>Bienvenu(e) admin à</h4>
         <h1>UDÁLOST</h1>
         <br />
         <img src="../../assets/images/loading.gif" />
@@ -29,7 +29,7 @@ export default {
     callFunction: function() {
       var v = this;
       setTimeout(function() {
-        v.$router.push("/home");
+        v.$router.push("/gestionEvenement");
       }, 3000);
     },
   },

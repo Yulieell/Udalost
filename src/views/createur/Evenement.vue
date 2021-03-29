@@ -104,22 +104,30 @@
         </div>
       </div>
       <!--TABLE-->
+      <div id="messageVideE">
+            <span><i class="frown icon"></i> Vous n'avez pas encore créé d'événements</span>
+          </div>
       <div
         class="ui link cards stackable five column grid"
         id="cardsEvenement"
         @click="afficherEvenement"
       >
-        <a href="#visualiserEvenement-modal" class="card column" id="cardDiv">
+        <a
+          href="#visualiserEvenement-modal"
+          class="card column"
+          id="cardDiv"
+          v-for="(ev, i) in listeEvenements"
+        >
           <div class="image" id="imageCard">
             <img src="../../assets/images/iconCalendar.png" />
           </div>
           <div class="content">
-            <div class="header">RV Stages</div>
+            <div class="header">{{ev.titre}}</div>
             <div class="meta">
-              <a>24 bis rue Aristide Briand, 54520, Laxou France</a>
+              <a>{{ev.adresse}} {{ev.codePostal}} {{ev.ville}} {{ev.pays}}</a>
             </div>
             <div class="description">
-              Signer la convention de stages avec le chef de l'entreprise
+             {{ev.description}}
             </div>
           </div>
           <div class="extra content" id="content">
@@ -128,7 +136,7 @@
               75 participants
             </span>
             <span class="right floated" id="date">
-              21/05/2021 13h34
+              {{ev.date}} {{ev.heure}}
             </span>
           </div>
         </a>
@@ -142,11 +150,11 @@
           <div class="title">
             <span>CRÉER ÉVENEMENT</span>
           </div>
-          <form class="ui form">
+          <form class="ui form" @submit.prevent="creerEvenement">
             <h5
               style="
 								margin-top: 0%;
-								margin-bottom: 5%;
+								margin-bottom: 2%;
 								text-align: center;
                 font-size:1.1em;
 							"
@@ -159,14 +167,14 @@
             <div class="field">
               <div class="field">
                 <label><i class="quote left icon"></i>Titre</label>
-                <input type="text" name="" />
+                <input type="text" name="" v-model="titre" required />
               </div>
             </div>
 
             <div class="field">
               <div class="field">
                 <label><i class="align justify icon"></i>Description</label>
-                <textarea rows="2"></textarea>
+                <textarea rows="2" v-model="description" required></textarea>
               </div>
             </div>
 
@@ -174,11 +182,11 @@
               <div class="fields">
                 <div class="twelve wide field">
                   <label><i class="calendar alternate icon"></i>Date</label>
-                  <input type="date" />
+                  <input type="date" v-model="date" required />
                 </div>
                 <div class="four wide field">
                   <label><i class="clock icon"></i>Heure</label>
-                  <input type="time" name="" />
+                  <input type="time" name="" v-model="heure" required />
                 </div>
               </div>
             </div>
@@ -186,25 +194,34 @@
             <div class="field">
               <div class="field">
                 <label><i class="map marker alternate icon"></i>Adresse</label>
-                <input type="text" />
+                <input type="text" v-model="adresse" required />
               </div>
             </div>
 
             <div class="three fields">
               <div class="field">
                 <label><i class="address book icon"></i>Code postal</label>
-                <input type="text" name="" />
+                <input type="text" name="" v-model="codePostal" required />
               </div>
               <div class="field">
                 <label><i class="building icon"></i>Ville</label>
-                <input type="text" name="" />
+                <input type="text" name="" v-model="ville" required />
               </div>
               <div class="field">
                 <label><i class="flag icon"></i>Pays</label>
-                <input type="text" name="" />
+                <input type="text" name="" v-model="pays" required />
               </div>
             </div>
 
+            <div class="field">
+              <div class="field">
+                <label><i class="tags icon"></i>Type d'évenement</label>
+                <select class="ui fluid search" v-model="type">
+                  <option value="0">Public</option>
+                  <option value="1">Private</option>
+                </select>
+              </div>
+            </div>
             <div id="button" class="ui button" tabindex="0">
               <button>ENREGISTRER</button>
             </div>
@@ -218,16 +235,15 @@
     <div id="geolocaliser-modal" class="modal">
       <div class="modal__contentGeo">
         <div class="form">
-                    <a class="ui button" id="retour" href="javascript: history.go(-1)"> 
-      <i class="reply icon"></i> Retourner
-    </a>
+          <a class="ui button" id="retour" href="javascript: history.go(-1)">
+            <i class="reply icon"></i> Retourner
+          </a>
           <div class="title">
             <span>GÉOLOCALISATION DE "RENDEZ-VOUS STAGES"</span>
           </div>
           <form>
             <div id="map-example-container"></div>
             <input
-              type="search"
               id="input-map"
               class="form-control"
               placeholder="Quelle est l'adresse de votre événement ?"
@@ -286,6 +302,16 @@
             </div>
 
             <div class="field">
+              <div class="field">
+                <label><i class="tags icon"></i>Type d'évenement</label>
+                <select class="ui search">
+                  <option value="0">Public</option>
+                  <option value="1">Private</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
               <div class="fields">
                 <div class="twelve wide field">
                   <label><i class="calendar alternate icon"></i>Date</label>
@@ -319,6 +345,7 @@
                 <input type="text" name="" />
               </div>
             </div>
+
             <div id="button" class="ui button" tabindex="0">
               <button>MODIFIER</button>
             </div>
@@ -339,23 +366,34 @@
 
 <script>
 import HelloWorld from "@/components/HelloWorld.vue";
+import axios from "axios";
 
 export default {
   name: "Home",
   data() {
     return {
-      form: {
-        country: {
-          label: null,
-          data: {},
-        },
-      },
+      token: this.$store.state.membre.token,
+      titre: "",
+      description: "",
+      date: "",
+      heure: "",
+      latitude: "",
+      longitude: "",
+      adresse: "",
+      codePostal: "",
+      ville: "",
+      pays: "",
+      type: "",
+      listeEvenements: [],
+      id: this.$store.state.membre.utilisateur.id,
+      token: this.$store.state.membre.token,
     };
   },
   components: {
     HelloWorld,
   },
   mounted() {
+    this.afficherEvenementsUser();
     (function() {
       var latlng = {
         lat: 48.8566,
@@ -456,6 +494,80 @@ export default {
     })();
   },
   methods: {
+    creerEvenement() {
+      const config = {
+        headers: { Authorization: `Bearer ${this.token}` },
+      };
+      axios
+        .post(
+          "http://localhost:8080/evenements/",
+          {
+            titre: this.titre,
+            description: this.description,
+            date: this.date,
+            heure: this.heure,
+            latitude: "134.4",
+            longitude: "34.2",
+            adresse: this.adresse,
+            codePostal: this.codePostal,
+            ville: this.ville,
+            pays: this.pays,
+            type: this.type,
+          },
+          config
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.$router.push("/successev");
+        })
+        .catch((error) => {
+          this.$router.push("/errorev");
+          console.log("Error ========>", error);
+        });
+    },
+
+    afficherEvenementsUser() {
+      const data = new URLSearchParams();
+      data.append("grant_type", "client_credentials");
+
+      axios({
+        url: `http://localhost:8080/utilisateurs/` + this.id,
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Accept-Language": "en_US",
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Access-Control-Allow-Origin": "*",
+        },
+        withCredentials: true,
+      })
+        .then(
+          (response) => {;
+            if(response.data.utilisateur[0].evenementsCrees[0].length > 0){
+              console.log('1----'+this.listeEvenements);
+              console.log("Il y a des évenements");
+              //response.data.utilisateur[0].evenementsCrees[0][0].evenementCree
+              this.listeEvenements = response.data.utilisateur[0].evenementsCrees[0];
+              for(var i=0; i<response.data.utilisateur[0].evenementsCrees[0].length; i++){
+                this.listeEvenements[i] = response.data.utilisateur[0].evenementsCrees[0][i].evenementCree;
+              }
+            }else{
+              console.log("Il y a pas des évenements");
+              this.listeEvenements = [];
+              document.getElementById('messageVideE').style.display = "block";
+            }
+          
+          },
+          function(err) {
+            //throw new Error("end of pagination");
+            console.log("error");
+          }
+        )
+        .catch((error) => {
+          alert("Error :" + error);
+        });
+    },
+
     seDeconnecter() {
       this.$router.push("/");
     },
@@ -501,6 +613,13 @@ export default {
 
 * {
   font-family: "Raleway", sans-serif;
+}
+
+#messageVideE{
+  text-align: center;
+  font-size: 1.2em;
+  display: none;
+  color: rgb(126, 4, 4);
 }
 
 a {
@@ -1015,10 +1134,12 @@ $transition: 0.3s ease-out all;
     width: 100%;
 
     & input,
-    textarea {
+    textarea,
+    select {
       background-color: #30303015;
       height: 4vh;
       border: none;
+      color: black;
 
       &:hover {
         background-color: #a6d0f42d;
@@ -1085,7 +1206,8 @@ $transition: 0.3s ease-out all;
     width: 100%;
 
     & input,
-    textarea {
+    textarea,
+    select {
       background-color: #30303015;
       height: 4vh;
       border: none;
@@ -1230,17 +1352,17 @@ $transition: 0.3s ease-out all;
   }
 }
 
-#retour{
-    background: rgba(255, 255, 255);
-    color:grey;
-    border-radius: 0px;
-    height: 15px;
-    justify-content: center;
-    margin-left: 8.2%;
+#retour {
+  background: rgba(255, 255, 255);
+  color: grey;
+  border-radius: 0px;
+  height: 15px;
+  justify-content: center;
+  margin-left: 8.2%;
 
-    &:hover{
-        border: none;
-        color: #484877ff;
-    }
+  &:hover {
+    border: none;
+    color: #484877ff;
+  }
 }
 </style>

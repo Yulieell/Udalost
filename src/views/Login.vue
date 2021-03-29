@@ -4,8 +4,13 @@
       <div class="form-container sign-in-container">
         <form action="#" @submit.prevent="seConnecter">
           <img class="imgUser" src="../assets/images/logo.png" />
-          <input type="email" placeholder="Email" />
-          <input type="password" placeholder="Mot de passe" />
+          <input v-model="emailL" type="email" placeholder="Email" required />
+          <input
+            v-model="motpasseL"
+            type="password"
+            placeholder="Mot de passe"
+            required
+          />
           <a href="#" class="links">Mot de passe oublié ?</a>
           <button class="button2">SE CONNECTER</button>
         </form>
@@ -18,15 +23,24 @@
             v-model="username"
             placeholder="Nom d'utilisateur"
           />
-          <input type="text" v-model="prenom" placeholder="Prénom" />
-          <input type="text" v-model="nom" placeholder="Nom" />
-          <input type="email" v-model="email" placeholder="Email" />
+          <input type="text" v-model="prenom" placeholder="Prénom" required />
+          <input type="text" v-model="nom" placeholder="Nom" required />
+          <input type="email" v-model="email" placeholder="Email" required />
           <input
+            required
             type="password"
             v-model="motpasse"
             placeholder="Mot de passe"
           />
-          <input type="password" placeholder="Vérifier mot de passe" />
+          <input
+            type="password"
+            v-model="motpassev"
+            placeholder="Vérifier mot de passe"
+            required
+          />
+          <div id="messageError">
+            <span>Les mots de passe ne sont pas identiques</span>
+          </div>
           <button class="button1">CRÉER COMPTE</button>
         </form>
       </div>
@@ -75,9 +89,13 @@ export default {
       prenom: "",
       email: "",
       motpasse: "",
+      motpassev: "",
+      emailL: "",
+      motpasseL: "",
     };
   },
   mounted() {
+    //this.test();
     const signUpButton = document.getElementById("signUp");
     const signInButton = document.getElementById("signIn");
     const container = document.getElementById("container");
@@ -92,42 +110,87 @@ export default {
   },
   methods: {
     seConnecter() {
-      this.$router.push("/loading");
+      const data = new URLSearchParams();
+      data.append("grant_type", "client_credentials");
+
+      axios({
+        url: `http://localhost:8080/connexion`,
+        method: "POST",
+        auth: {
+          username: this.emailL,
+          password: this.motpasseL,
+        },
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Access-Control-Allow-Origin": "*",
+        },
+        withCredentials: true,
+      })
+        .then(
+          (response) => {
+            if(this.emailL == 'admin@admin.com'){
+              this.$store.commit("setAdmin", response.data);
+              console.log("Admin");
+              this.$router.push("/loadingadmin");
+            }else{
+              this.$store.commit("setMembre", response.data);
+              console.log("user");
+              this.$router.push("/loading");
+            }
+          },
+          (error) => {
+            if (error.response.status === 401) {
+              console.log("ERROR CONNEXION");
+            }
+            return error;
+          }
+        )
+        .catch((error) => {
+          alert("Error :" + error);
+        });
     },
 
     creerCompte() {
-      const headers = {
-        Origin: "http://localhost:8080/",
-      };
+      const data = new URLSearchParams();
+      data.append("grant_type", "client_credentials");
 
-      axios
-        .post(
-          "https://api.udalost.web:10243/utilisateurs",
-          {
+      if (this.motpasse == this.motpassev) {
+        axios
+          .post("http://localhost:8080/utilisateurs", {
             username: this.username,
             nom: this.nom,
             prenom: this.prenom,
             email: this.email,
             motpasse: this.motpasse,
-          },
-          { headers }
-        )
-        .then((response) => {
-          console.log(response.data);
-          alert("Votre compte a été bien créé");
-        })
-        .catch((error) => {
-          console.log("Error ========>", error);
-        });
+            headers: {
+              Accept: "application/json",
+              "Accept-Language": "en_US",
+              "Content-Type": "application/x-www-form-urlencoded",
+              "Access-Control-Allow-Origin": "http://localhost:8080/",
+            },
+            withCredentials: true,
+          })
+          .then((response) => {
+            this.$router.push("/successcc");
+          })
+          .catch((error) => {
+            console.log("Error ========>", error);
+            this.$router.push("/errorcc");
+          });
+      } else {
+        document.getElementById("messageError").style.display = "block";
+      }
     },
 
     test() {
       axios
-        .get("https://api.udalost.web:10243/utilisateurs")
+        .get("http://localhost:8080/utilisateurs")
         .then((response) => {
-          console.log(response.data);
-          alert("hi");
-          //this.$router.push('/se-connecter');
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log("Error ========>", error);
         });
     },
   },
@@ -139,6 +202,12 @@ export default {
 * {
   box-sizing: border-box;
   font-family: "Raleway", sans-serif;
+}
+
+#messageError {
+  text-align: center;
+  color: red;
+  display: none;
 }
 
 .general {

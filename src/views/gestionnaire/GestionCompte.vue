@@ -5,17 +5,9 @@
         <!--MENU ORDINATEUR-->
         <div id="menu">
           <ul>
-            <li class="column">
-              <a @click="accueil" accesskey="1" title="">Accueil</a>
-            </li>
-            <li>
-              <a @click="evenement" class="column" accesskey="2" title=""
-                >Évenement</a
-              >
-            </li>
             <li class="active">
-              <a @click="profil" class="column" accesskey="4" title=""
-                >Profil</a
+              <a @click="evenement" class="column" accesskey="2" title=""
+                >Administration</a
               >
             </li>
             <li>
@@ -40,9 +32,9 @@
 
             <b-collapse id="navbar-toggle-collapse" is-nav>
               <b-navbar-nav class="">
-                <b-nav-item @click="accueil" href="#">Accueil</b-nav-item>
-                <b-nav-item @click="evenement">Évenement</b-nav-item>
-                <b-nav-item class="active" @click="profil">Profil</b-nav-item>
+                <b-nav-item @click="evenement" class="active"
+                  >Évenement</b-nav-item
+                >
                 <b-nav-item @click="seDeconnecter">Se déconnecter</b-nav-item>
               </b-navbar-nav>
             </b-collapse>
@@ -52,69 +44,111 @@
       </div>
     </div>
 
+    <div
+      class="ui secondary pointing menu ui stackable two column grid"
+      id="submenu"
+    >
+      <a class="item column" @click="evenement">
+        Événements
+      </a>
+      <a class="active item column" @click="compte">
+        Utilisateurs
+      </a>
+    </div>
     <div id="wrapper">
-      <div class="form">
-        <div class="title">
-          <span>ÉVENEMENT "RENDEZ-VOUS STAGES"</span>
+      <div
+        class="ui stackable two column grid"
+        style="margin:0px !important; width:100%; padding:0px !important; padding-left:8.2%; padding-right:8.2%; margin-bottom:3%;"
+      >
+        <div
+          class="ui search column"
+          style="margin:0px !important; float:right; width:100%; padding:0px !important;"
+        >
+          <div class="ui icon input" id="chercheur">
+            <input
+              class="prompt"
+              type="text"
+              placeholder="Rechercher évenement..."
+            />
+            <i class="search icon"></i>
+          </div>
+          <div class="results"></div>
         </div>
-         <h5
-              style="
-								margin-top: 0%;
-								margin-bottom: 5%;
-								text-align: center;
-                font-size:1.1em;
-							"
-            >
-              <i class="user circle icon"></i>Vous trouverez ci-dessous vos informations enregistrées lors de la création de votre compte, vous pouvez les modifier à tout moment.
-            </h5>
+      </div>
+      <!--TABLE-->
 
-        <form class="ui form">
-          <div
-            class="ui small basic icon buttons column ui stackable three column grid"
-            style="margin:0px !important; float:right; width:20%; padding:0px !important;"
-            id="iconsModal"
-          ></div>
-          <div class="field">
+      <div
+        class="ui link cards stackable five column grid"
+        id="cardsEvenement"
+      >
+        <a
+          href="#visualiserEvenement-modal"
+          class="card column"
+          id="cardDiv"
+        >
+        <div id="iconB">
+        <a><i class="large red trash alternate icon"></i></a>
+        </div>
+          <div class="image" id="imageCard">
+            <img src="../../assets/images/users.png" />
+          </div>
+          <div class="extra content" id="content">
+            <span class="right floated" id="date">
+              ev.date ev.heure
+            </span>
+          </div>
+        </a>
+      </div>
+      <!--FIN TABLE-->
+    </div>
+
+    <div id="visualiserEvenement-modal" class="modal">
+      <div class="modal__contentModal">
+        <div class="form">
+          <div class="title">
+            <span>ÉVENEMENT "RENDEZ-VOUS STAGES"</span>
+          </div>
+
+          <form class="ui form">
+            <div
+              class="ui small basic icon buttons column ui stackable one column grid"
+              style="margin:0px !important; float:right; width:15%; padding:0px !important;"
+              id="iconsModal"
+            >
+              <a class="ui button column">
+                <i class="large red trash alternate icon"></i>
+                Supprimer
+              </a>
+            </div>
+            <div class="field">
             <div class="field">
               <label><i class="address book icon"></i>Username</label>
-              <input type="text" name="" />
+              <input type="text" name="" readonly="readonly" />
             </div>
           </div>
 
           <div class="two fields">
             <div class="field">
               <label><i class="address card icon"></i>Nom</label>
-              <input type="text" name="" />
+              <input type="text" name="" readonly="readonly"/>
             </div>
             <div class="field">
               <label><i class="address card icon"></i>Prénom</label>
-              <input type="text" name="" />
+              <input type="text" name="" readonly="readonly"/>
             </div>
           </div>
 
           <div class="field">
             <div class="field">
               <label><i class="envelope icon"></i>Email</label>
-              <input type="email" />
+              <input type="email" readonly="readonly"/>
             </div>
           </div>
-
-          <div class="two fields">
-            <div class="field">
-              <label><i class="lock icon"></i>Mot de passe</label>
-              <input type="password" name="" />
-            </div>
-            <div class="field">
-              <label><i class="lock icon"></i>Vérifier mot de passe</label>
-              <input type="password" name="" />
-            </div>
-          </div>
-
-          <div id="button" class="ui button" tabindex="0">
-            <button id="green">MODIFIER</button>
-          </div>
-        </form>
+          </form>
+        </div>
+        <a href="#" class="modal__close">&times;</a>
       </div>
+      <div id="popup-overlay"></div>
     </div>
 
     <div id="copyright" class="container">
@@ -126,15 +160,13 @@
 </template>
 
 <script>
-import HelloWorld from "@/components/HelloWorld.vue";
-//const $ = require("jquery");
-// On le declare globalement
-//window.$ = $;
 
 export default {
   name: "Home",
+  data() {
+    return {};
+  },
   components: {
-    HelloWorld,
   },
   mounted() {},
   methods: {
@@ -142,24 +174,15 @@ export default {
       this.$router.push("/");
     },
 
-    accueil() {
-      this.$router.push("/home");
-    },
-
     evenement() {
-      this.$router.push("/evenement");
+      this.$router.push("/gestionEvenement");
     },
 
-    profil() {
-      this.$router.push("/profil");
-    },
-    invitation() {
-      this.$router.push("/invitation");
+    compte() {
+      this.$router.push("/gestionCompte");
     },
 
-    evenementPublic() {
-      this.$router.push("/evenementPublic");
-    },
+    afficherCompte() {},
   },
 };
 </script>
@@ -168,6 +191,22 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap");
 @import "node_modules/bootstrap/scss/bootstrap.scss";
 @import "node_modules/bootstrap-vue/src/index.scss";
+@import "https://cdn.jsdelivr.net/leaflet/1/leaflet.css";
+
+#map-example-container {
+  height: 60vh;
+}
+
+
+#iconB{
+  margin-left:90%; 
+  cursor:pointer; 
+  background: white !important;
+
+  &:hover{
+    background: white !important;
+  }
+}
 
 * {
   font-family: "Raleway", sans-serif;
@@ -333,7 +372,7 @@ a:hover {
 
 #wrapper {
   width: 100% !important;
-  padding: 4em 0em 0em 0em;
+  padding: 4em 0em 7em 0em;
   background: #fff;
 }
 
@@ -542,7 +581,6 @@ a:hover {
     #content {
       background-color: rgb(0, 0, 0);
       width: 100%;
-      height: 70px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -551,10 +589,6 @@ a:hover {
 
       span {
         margin-left: 5%;
-      }
-
-      #date {
-        color: #a6cff4;
       }
 
       &:hover {
@@ -573,12 +607,12 @@ a:hover {
   margin-right: 8.2%;
   border: none;
 
-  & button {
+  & a {
     float: right;
     border: none;
     border-radius: 0%;
     font-size: 100%;
-    background-color: rgb(0, 110, 37) !important;
+    background-color: #88b2d6 !important;
     color: white !important;
     width: 100%;
     border-radius: 100px;
@@ -588,7 +622,7 @@ a:hover {
     }
 
     &:hover {
-      background-color: rgb(0, 65, 22) !important;
+      background-color: #65839e !important;
     }
   }
 }
@@ -633,65 +667,215 @@ a:hover {
   img {
     width: 50%;
     padding: 4%;
-    filter: hue-rotate(200deg);
   }
 }
+
+//modal
 
 $base: #0f1923;
 $white: #ece8e1;
 $height: 7vh;
 $transition: 0.3s ease-out all;
 
-.form {
+.modal {
+  visibility: hidden;
+  opacity: 0;
+  z-index: 50;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.719);
+  height: 100vh;
+  transition: all 0.4s;
+}
+
+.modal:target {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal__contentCreerEv {
+  border-radius: 10px;
+  position: relative;
   width: 100%;
-  padding: 2%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  input {
-    background-color: #30303015 !important;
-    height: 4vh;
-    border: none;
+  & > .form {
+    border-radius: 10px;
+    box-shadow: 10px $base;
+    background-color: rgb(255, 255, 255);
+    padding: 3%;
+    padding-bottom: 2%;
+    font-size: 1.3vh;
+    margin: 5%;
+    width: 100%;
 
-    &:hover {
-      background-color: #a6d0f42d;
-      border: 1px solid #a6d0f42d;
-    }
-  }
-  & .title {
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    grid-template-columns: repeat(3, 1fr);
-    color: #484877ff;
-    text-align: center;
-    height: 10px;
-    font-size: 150%;
-
-    & span {
-      grid-column: 2/3;
-    }
-  }
-
-  & #button {
-    display: flex;
-    justify-content: center;
-    background-color: white;
-    border: none !important;
-
-    & button {
-      border-radius: 100px;
-      width: 40%;
-      height: 5vh;
-      border: none !important;
-      background-color: rgb(48, 48, 78);
-      color: white;
-      cursor: pointer;
+    & input,
+    textarea {
+      background-color: #30303015;
+      height: 4vh;
+      border: none;
 
       &:hover {
+        background-color: #a6d0f42d;
+        border: 1px solid #a6d0f42d;
+      }
+    }
+    & .title {
+      display: grid;
+      justify-content: center;
+      align-items: center;
+      grid-template-columns: repeat(3, 1fr);
+      color: #484877ff;
+      text-align: center;
+      height: 10px;
+      font-size: 150%;
+
+      & span {
+        grid-column: 2/3;
+      }
+    }
+
+    & #button {
+      display: flex;
+      justify-content: center;
+      background-color: white;
+      border: none !important;
+
+      & button {
+        border-radius: 100px;
+        width: 50%;
+        height: 5vh;
+        border: none !important;
+        background-color: rgb(48, 48, 78);
+        color: white;
+        cursor: pointer;
+
+        &:hover {
           border: none !important;
-          background-color: rgb(19, 19, 32);
+          background-color: rgba(72, 72, 119, 0.822);
           transition: 0.5s;
         }
+      }
     }
   }
 }
+
+.modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #a6cff4;
+  margin-right: 5%;
+  font-size: 30px;
+  text-decoration: none;
+
+  &:hover {
+    color: #a6cff4;
+  }
+}
+
+#iconsModal {
+  border: none;
+  border-radius: 0;
+
+  & a:hover {
+    border-radius: 0;
+    border: none;
+    background: #f5f5f5 !important;
+  }
+}
+
+#retour{
+    background: rgba(255, 255, 255);
+    color:grey;
+    border-radius: 0px;
+    height: 15px;
+    justify-content: center;
+    margin-left: 8.2%;
+
+    &:hover{
+        border: none;
+        color: #484877ff;
+    }
+}
+
+.modal__contentModal {
+  border-radius: 10px;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & > .form {
+    border-radius: 10px;
+    box-shadow: 10px $base;
+    background-color: rgb(255, 255, 255);
+    padding: 3%;
+    padding-bottom: 2%;
+    font-size: 1.3vh;
+    margin: 5%;
+    width: 100%;
+
+    & input,
+    textarea {
+      background-color: #30303015;
+      height: 4vh;
+      border: none;
+
+      &:hover {
+        background-color: #a6d0f42d;
+        border: 1px solid #a6d0f42d;
+      }
+    }
+    & .title {
+      display: grid;
+      justify-content: center;
+      align-items: center;
+      grid-template-columns: repeat(3, 1fr);
+      color: #484877ff;
+      text-align: center;
+      height: 10px;
+      font-size: 150%;
+
+      & span {
+        grid-column: 2/3;
+      }
+    }
+
+    & #button {
+      display: flex;
+      justify-content: center;
+      background-color: white;
+      border: none !important;
+
+      & button {
+        border-radius: 100px;
+        width: 50%;
+        height: 5vh;
+        border: none !important;
+        background-color: rgb(48, 48, 78);
+        color: white;
+        cursor: pointer;
+
+        &:hover {
+          border: none !important;
+          background-color: rgba(72, 72, 119, 0.822);
+          transition: 0.5s;
+        }
+      }
+    }
+  }
+}
+
 </style>

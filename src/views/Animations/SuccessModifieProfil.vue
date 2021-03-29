@@ -2,10 +2,9 @@
   <div>
     <div class="div">
       <div class="image">
-        <h4>Bienvenu(e) {{fullname}} à</h4>
-        <h1>UDÁLOST</h1>
+        <h4>Votre profil a été bien modifié</h4>
         <br />
-        <img src="../../assets/images/loading.gif" />
+        <img src="../../assets/images/check.gif" />
       </div>
     </div>
   </div>
@@ -16,11 +15,6 @@ export default {
   props: {
     msg: String,
   },
-  data() {
-    return {
-        fullname : this.$store.state.membre.utilisateur.prenom + ' ' + this.$store.state.membre.utilisateur.nom
-    };
-  },
   mounted() {
     this.callFunction();
   },
@@ -29,8 +23,8 @@ export default {
     callFunction: function() {
       var v = this;
       setTimeout(function() {
-        v.$router.push("/home");
-      }, 3000);
+        v.$router.push("/profil");
+      }, 1500);
     },
   },
 };
@@ -49,27 +43,18 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: linear-gradient(rgba(36, 36, 36, 0.664), #484877ff),
-    url("../../assets/images/background.jpg");
-  background-size: 100%;
+  background: rgb(255, 255, 255);
 }
 
 .image {
   text-align: center;
-  & h1,
-  h4 {
-    color: white;
-    padding: 1%;
+  & h4 {
+    color: black;
     font-family: "Raleway", sans-serif;
   }
 
-  h1 {
-    font-size: 1000%;
-  }
-
   & img:first-of-type {
-    width: 100%;
-    margin-top: -20%;
+    width: 50%;
   }
 }
 </style>
