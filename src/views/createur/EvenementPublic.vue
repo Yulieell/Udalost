@@ -68,6 +68,7 @@
         Évenements publics
       </a>
     </div>
+
     <div id="wrapper">
       <div
         class="ui stackable two column grid"
@@ -88,36 +89,50 @@
           <div class="results"></div>
         </div>
       </div>
-
       <!--TABLE-->
-      <div class="ui link cards stackable five column grid" id="cardsEvenement">
-        <a href="#visualiserEvenement-modal" class="card column" id="cardDiv">
-          <div class="image" id="imageCard">
-            <img src="../../assets/images/iconCalendar.png" />
-          </div>
-          <div class="content">
-            <div class="header">RV Stages</div>
-            <div class="meta">
-              <a>24 bis rue Aristide Briand, 54520, Laxou France</a>
+      <div id="messageVideE">
+        <span
+          ><i class="frown icon"></i> Vous n'avez pas encore créé
+          d'événements</span
+        >
+      </div>
+      <div
+        class="ui link cards stackable five column grid"
+        id="cardsEvenement"
+        @click="afficherEvenement"
+      >
+        <a
+          href="#visualiserEvenement-modal"
+          class="card column"
+          id="cardDiv"
+          v-for="(ev, i) in listeEvenements.evenement"
+        >
+          <div style="color:black;" @click="unEvenement(ev.id)">
+            <div class="image" id="imageCard">
+              <img src="../../assets/images/iconCalendar.png" />
             </div>
-            <div class="description">
-              Signer la convention de stages avec le chef de l'entreprise
+            <div class="content">
+              <div class="header">{{ ev.titre }}</div>
+              <div class="meta">
+                <a
+                  >{{ ev.adresse }} {{ ev.codePostal }} {{ ev.ville }}
+                  {{ ev.pays }}</a
+                >
+              </div>
+              <div class="description">
+                {{ ev.description }}
+              </div>
             </div>
-          </div>
-          <div class="extra content" id="content">
-            <span>
-              <i class="user icon"></i>
-              75 participants
-            </span>
-            <span class="right floated" id="date">
-              21/05/2021 13h34
-            </span>
+            <div class="extra content" id="content">
+              <span class="right floated" id="date">
+                Date : {{ ev.date }} {{ ev.heure }}
+              </span>
+            </div>
           </div>
         </a>
       </div>
       <!--FIN TABLE-->
     </div>
-
 
     <div id="visualiserEvenement-modal" class="modal">
       <div class="modal__contentVisualiserEv">
@@ -140,7 +155,7 @@
             <div class="field">
               <div class="field">
                 <label><i class="quote left icon"></i>Titre</label>
-                <input type="text" name="" readonly="readonly"/>
+                <input type="text" name="" readonly="readonly" />
               </div>
             </div>
 
@@ -159,7 +174,7 @@
                 </div>
                 <div class="four wide field">
                   <label><i class="clock icon"></i>Heure</label>
-                  <input type="time" name="" readonly="readonly"/>
+                  <input type="time" name="" readonly="readonly" />
                 </div>
               </div>
             </div>
@@ -167,22 +182,22 @@
             <div class="field">
               <div class="field">
                 <label><i class="map marker alternate icon"></i>Adresse</label>
-                <input type="text" readonly="readonly"/>
+                <input type="text" readonly="readonly" />
               </div>
             </div>
 
             <div class="three fields">
               <div class="field">
                 <label><i class="address book icon"></i>Code postal</label>
-                <input type="text" name="" readonly="readonly"/>
+                <input type="text" name="" readonly="readonly" />
               </div>
               <div class="field">
                 <label><i class="building icon"></i>Ville</label>
-                <input type="text" name="" readonly="readonly"/>
+                <input type="text" name="" readonly="readonly" />
               </div>
               <div class="field">
                 <label><i class="flag icon"></i>Pays</label>
-                <input type="text" name="" readonly="readonly"/>
+                <input type="text" name="" readonly="readonly" />
               </div>
             </div>
             <div class="two fields" id="buttonOptions">
@@ -214,18 +229,147 @@
 
 <script>
 import HelloWorld from "@/components/HelloWorld.vue";
-//const $ = require("jquery");
-// On le declare globalement
-//window.$ = $;
+import axios from "axios";
 
 export default {
   name: "Home",
+  data() {
+    return {
+      listeEvenements: [],
+    };
+  },
   components: {
     HelloWorld,
   },
-  mounted() {},
+  mounted() {
+    this.afficherEvenementsPublics();
+  },
   methods: {
+
+    rejoindreEvenement(id) {
+      const config = {
+        headers: { Authorization: `Bearer ${this.token}` },
+      };
+      axios
+        .put(
+          "http://localhost:8080/evenements/" + id + "/rejoindre",
+          {
+            nom: "",
+            status: "2",
+            message: "Bonjour, je suis le createur",
+          },
+          config
+        )
+        .then((response) => {
+          console.log("REJOINDRE EVENEMENT");
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log("Error ========>", error);
+        });
+    },
+
+    afficherEvenementsUser() {
+
+      axios({
+        url: `http://localhost:8080/utilisateurs/` + this.id,
+        method: "GET",
+      })
+        .then(
+          (response) => {
+            if (response.data.utilisateur[0].evenementsCrees[0].length > 0) {
+              console.log("Il y a des évenements");
+              //response.data.utilisateur[0].evenementsCrees[0][0].evenementCree
+              this.listeEvenements =
+                response.data.utilisateur[0].evenementsCrees[0];
+              for (
+                var i = 0;
+                i < response.data.utilisateur[0].evenementsCrees[0].length;
+                i++
+              ) {
+                this.listeEvenements[i] =
+                  response.data.utilisateur[0].evenementsCrees[0][
+                    i
+                  ].evenementCree;
+              }
+            } else {
+              console.log("Il y a pas des évenements");
+              this.listeEvenements = [];
+              document.getElementById("messageVideE").style.display = "block";
+            }
+          },
+          function(err) {
+            //throw new Error("end of pagination");
+            console.log("error");
+          }
+        )
+        .catch((error) => {
+          alert("Error :" + error);
+        });
+    },
+
+    afficherEvenementsPublics() {
+
+      axios({
+        url: `http://localhost:8080/evenements/`,
+        method: "GET",
+      })
+        .then(
+          (response) => {
+            if (response.data) {
+              console.log("Il y a des évenements");
+              console.log(response.data.evenements[0].evenement.adresse);
+
+              for(var i=0; i<response.data.evenements.length; i++){
+                console.log(this.listeEvenements);
+              }
+
+              this.listeEvenements[i] = response.data.evenements;
+              console.log("-----"+this.listeEvenements);
+            } else {
+              console.log("Il y a pas des évenements");
+              this.listeEvenements = [];
+              document.getElementById("messageVideE").style.display = "block";
+            }
+          },
+          function(err) {
+            //throw new Error("end of pagination");
+            console.log("error");
+          }
+        )
+        .catch((error) => {
+          alert("Error :" + error);
+        });
+    },
+
+    unEvenement(id) {
+      axios
+        .get("http://localhost:8080/evenements/" + id)
+        .then((response) => {
+          console.log("AFFICHER UN EVENEMENT");
+          this.totalParticipants =
+            response.data.evenement[0].participants.count +
+            (this.totalParticipants =
+              response.data.evenement[0].participantsNonInscrits.count);
+          this.titreModal = response.data.evenement[0].titre;
+          this.descriptionModal = response.data.evenement[0].description;
+          this.dateModal = response.data.evenement[0].date;
+          this.heureModal = response.data.evenement[0].heure;
+          this.latitudeModal = response.data.evenement[0].latitude;
+          this.longitudeModal = response.data.evenement[0].longitude;
+          this.adresseModal = response.data.evenement[0].adresse;
+          this.codePostalModal = response.data.evenement[0].codePostal;
+          this.villeModal = response.data.evenement[0].ville;
+          this.paysModal = response.data.evenement[0].pays;
+          this.typeModal = response.data.evenement[0].type;
+        })
+        .catch((error) => {
+          console.log("Error ========>", error);
+        });
+    },
+
     seDeconnecter() {
+      this.$store.commit("setMembre", "");
       this.$router.push("/");
     },
 
@@ -240,6 +384,7 @@ export default {
     profil() {
       this.$router.push("/profil");
     },
+
     invitation() {
       this.$router.push("/invitation");
     },
@@ -247,6 +392,12 @@ export default {
     evenementPublic() {
       this.$router.push("/evenementPublic");
     },
+
+    participant() {
+      this.$router.push("/participant");
+    },
+
+    afficherEvenement() {},
   },
 };
 </script>
@@ -255,9 +406,21 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap");
 @import "node_modules/bootstrap/scss/bootstrap.scss";
 @import "node_modules/bootstrap-vue/src/index.scss";
+@import "https://cdn.jsdelivr.net/leaflet/1/leaflet.css";
+
+#map-example-container {
+  height: 40vh;
+}
 
 * {
   font-family: "Raleway", sans-serif;
+}
+
+#messageVideE {
+  text-align: center;
+  font-size: 1.2em;
+  display: none;
+  color: rgb(126, 4, 4);
 }
 
 a {
@@ -660,7 +823,7 @@ a:hover {
   margin-right: 8.2%;
   border: none;
 
-  & button {
+  & a {
     float: right;
     border: none;
     border-radius: 0%;
@@ -751,6 +914,149 @@ $transition: 0.3s ease-out all;
 .modal:target {
   visibility: visible;
   opacity: 1;
+}
+
+.modal__contentCreerEv {
+  border-radius: 10px;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & > .form {
+    border-radius: 10px;
+    box-shadow: 10px $base;
+    background-color: rgb(255, 255, 255);
+    padding: 3%;
+    padding-bottom: 2%;
+    font-size: 1.3vh;
+    margin: 5%;
+    width: 100%;
+
+    & input,
+    textarea,
+    select {
+      background-color: #30303015;
+      height: 4vh;
+      border: none;
+      color: black;
+
+      &:hover {
+        background-color: #a6d0f42d;
+        border: 1px solid #a6d0f42d;
+      }
+    }
+    & .title {
+      display: grid;
+      justify-content: center;
+      align-items: center;
+      grid-template-columns: repeat(3, 1fr);
+      color: #484877ff;
+      text-align: center;
+      height: 10px;
+      font-size: 150%;
+
+      & span {
+        grid-column: 2/3;
+      }
+    }
+
+    & #button {
+      display: flex;
+      justify-content: center;
+      background-color: white;
+      border: none !important;
+
+      & button {
+        border-radius: 100px;
+        width: 50%;
+        height: 5vh;
+        border: none !important;
+        background-color: rgb(48, 48, 78);
+        color: white;
+        cursor: pointer;
+
+        &:hover {
+          border: none !important;
+          background-color: rgba(72, 72, 119, 0.822);
+          transition: 0.5s;
+        }
+      }
+    }
+  }
+}
+
+.modal__contentVisualiserEv {
+  border-radius: 10px;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & > .form {
+    border-radius: 10px;
+    box-shadow: 10px $base;
+    background-color: rgb(255, 255, 255);
+    padding: 3%;
+    padding-bottom: 2%;
+    font-size: 1.3vh;
+    margin: 5%;
+    width: 100%;
+
+    & input,
+    textarea,
+    select {
+      background-color: #30303015;
+      height: 4vh;
+      border: none;
+
+      &:hover {
+        background-color: #a6d0f42d;
+        border: 1px solid #a6d0f42d;
+      }
+    }
+    & .title {
+      display: grid;
+      justify-content: center;
+      align-items: center;
+      grid-template-columns: repeat(3, 1fr);
+      color: #484877ff;
+      text-align: center;
+      height: 10px;
+      font-size: 150%;
+
+      & span {
+        grid-column: 2/3;
+      }
+    }
+
+    & #button {
+      display: flex;
+      justify-content: center;
+      background-color: white;
+      border: none !important;
+
+      & button {
+        border-radius: 100px;
+        width: 50%;
+        height: 5vh;
+        border: none !important;
+        background-color: rgb(48, 48, 78);
+        color: white;
+        cursor: pointer;
+
+        &:hover {
+          border: none !important;
+          background-color: rgba(72, 72, 119, 0.822);
+          transition: 0.5s;
+        }
+      }
+    }
+  }
 }
 
 .modal__contentVisualiserEv {
@@ -862,7 +1168,17 @@ $transition: 0.3s ease-out all;
   }
 }
 
-#buttonOptions {
-  width: 100%;
+#retour {
+  background: rgba(255, 255, 255);
+  color: grey;
+  border-radius: 0px;
+  height: 15px;
+  justify-content: center;
+  margin-left: 8.2%;
+
+  &:hover {
+    border: none;
+    color: #484877ff;
+  }
 }
 </style>

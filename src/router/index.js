@@ -59,6 +59,14 @@ const routes = [
     component: () => import('../views/Animations/ErrorModifierProfil.vue')
   },
   {
+    path: '/successme',
+    component: () => import('../views/Animations/SuccessModifierEv.vue')
+  },
+  {
+    path: '/errorme',
+    component: () => import('../views/Animations/ErrorModifierEv.vue')
+  },
+  {
     path: '/successev',
     component: () => import('../views/Animations/SuccessEvCreer.vue')
   },

@@ -105,8 +105,11 @@
       </div>
       <!--TABLE-->
       <div id="messageVideE">
-            <span><i class="frown icon"></i> Vous n'avez pas encore créé d'événements</span>
-          </div>
+        <span
+          ><i class="frown icon"></i> Vous n'avez pas encore créé
+          d'événements</span
+        >
+      </div>
       <div
         class="ui link cards stackable five column grid"
         id="cardsEvenement"
@@ -118,26 +121,27 @@
           id="cardDiv"
           v-for="(ev, i) in listeEvenements"
         >
-          <div class="image" id="imageCard">
-            <img src="../../assets/images/iconCalendar.png" />
-          </div>
-          <div class="content">
-            <div class="header">{{ev.titre}}</div>
-            <div class="meta">
-              <a>{{ev.adresse}} {{ev.codePostal}} {{ev.ville}} {{ev.pays}}</a>
+          <div style="color:black;" @click="unEvenement(ev.id)">
+            <div class="image" id="imageCard">
+              <img src="../../assets/images/iconCalendar.png" />
             </div>
-            <div class="description">
-             {{ev.description}}
+            <div class="content">
+              <div class="header">{{ ev.titre }}</div>
+              <div class="meta">
+                <a
+                  >{{ ev.adresse }} {{ ev.codePostal }} {{ ev.ville }}
+                  {{ ev.pays }}</a
+                >
+              </div>
+              <div class="description">
+                {{ ev.description }}
+              </div>
             </div>
-          </div>
-          <div class="extra content" id="content">
-            <span>
-              <i class="user icon"></i>
-              75 participants
-            </span>
-            <span class="right floated" id="date">
-              {{ev.date}} {{ev.heure}}
-            </span>
+            <div class="extra content" id="content">
+              <span class="right floated" id="date">
+                Date : {{ ev.date }} {{ ev.heure }}
+              </span>
+            </div>
           </div>
         </a>
       </div>
@@ -265,7 +269,7 @@
             <span>ÉVENEMENT "RENDEZ-VOUS STAGES"</span>
           </div>
 
-          <form class="ui form">
+          <form class="ui form"  @submit.prevent="modifierEvenement">
             <div
               class="ui small basic icon buttons column ui stackable four column grid"
               style="margin:0px !important; float:right; width:50%; padding:0px !important;"
@@ -273,7 +277,7 @@
             >
               <a class="ui button column" @click="participant">
                 <i class="large purple users alternate icon"></i>
-                94 participants
+                {{ totalParticipants }} participants
               </a>
               <a class="ui button column">
                 <i class="large green share icon"></i> Partager
@@ -290,21 +294,21 @@
             <div class="field">
               <div class="field">
                 <label><i class="quote left icon"></i>Titre</label>
-                <input type="text" name="" />
+                <input type="text" name="" v-model="titreModal" />
               </div>
             </div>
 
             <div class="field">
               <div class="field">
                 <label><i class="align justify icon"></i>Description</label>
-                <textarea rows="2"></textarea>
+                <textarea rows="2" v-model="descriptionModal"></textarea>
               </div>
             </div>
 
             <div class="field">
               <div class="field">
                 <label><i class="tags icon"></i>Type d'évenement</label>
-                <select class="ui search">
+                <select class="ui search" v-model="typeModal">
                   <option value="0">Public</option>
                   <option value="1">Private</option>
                 </select>
@@ -315,11 +319,11 @@
               <div class="fields">
                 <div class="twelve wide field">
                   <label><i class="calendar alternate icon"></i>Date</label>
-                  <input type="date" />
+                  <input type="date" v-model="dateModal" />
                 </div>
                 <div class="four wide field">
                   <label><i class="clock icon"></i>Heure</label>
-                  <input type="time" name="" />
+                  <input type="time" name="" v-model="heureModal" />
                 </div>
               </div>
             </div>
@@ -327,22 +331,22 @@
             <div class="field">
               <div class="field">
                 <label><i class="map marker alternate icon"></i>Adresse</label>
-                <input type="text" />
+                <input type="text" v-model="adresseModal" />
               </div>
             </div>
 
             <div class="three fields">
               <div class="field">
-                <label><i class="address book icon"></i>Code postal</label>
-                <input type="text" name="" />
+                <label><i class="address book icon"></i>Code Postal</label>
+                <input type="text" name="" v-model="codePostalModal" />
               </div>
               <div class="field">
                 <label><i class="building icon"></i>Ville</label>
-                <input type="text" name="" />
+                <input type="text" name="" v-model="villeModal" />
               </div>
               <div class="field">
                 <label><i class="flag icon"></i>Pays</label>
-                <input type="text" name="" />
+                <input type="text" name="" v-model="paysModal" />
               </div>
             </div>
 
@@ -372,6 +376,10 @@ export default {
   name: "Home",
   data() {
     return {
+      typeE: [
+        { text: "Public", value: 0 },
+        { text: "Private", value: 1 },
+      ],
       token: this.$store.state.membre.token,
       titre: "",
       description: "",
@@ -385,6 +393,20 @@ export default {
       pays: "",
       type: "",
       listeEvenements: [],
+      participants: [],
+      titreModal: "",
+      descriptionModal: "",
+      dateModal: "",
+      heureModal: "",
+      latitudeModal: "",
+      longitudeModal: "",
+      adresseModal: "",
+      codePostalModal: "",
+      villeModal: "",
+      paysModal: "",
+      typeModal: "",
+      totalParticipants: "",
+      idEvenement : "",
       id: this.$store.state.membre.utilisateur.id,
       token: this.$store.state.membre.token,
     };
@@ -517,7 +539,7 @@ export default {
           config
         )
         .then((response) => {
-          console.log(response.data);
+          this.rejoindreEvenement(response.data.evenements.id);
           this.$router.push("/successev");
         })
         .catch((error) => {
@@ -526,37 +548,61 @@ export default {
         });
     },
 
-    afficherEvenementsUser() {
-      const data = new URLSearchParams();
-      data.append("grant_type", "client_credentials");
+    rejoindreEvenement(id) {
+      const config = {
+        headers: { Authorization: `Bearer ${this.token}` },
+      };
+      axios
+        .put(
+          "http://localhost:8080/evenements/" + id + "/rejoindre",
+          {
+            nom: "",
+            status: "2",
+            message: "Bonjour, je suis le createur",
+          },
+          config
+        )
+        .then((response) => {
+          console.log("REJOINDRE EVENEMENT");
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log("Error ========>", error);
+        });
+    },
 
-      axios({
+    afficherEvenementsUser() {
+
+      api({
         url: `http://localhost:8080/utilisateurs/` + this.id,
         method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Accept-Language": "en_US",
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Access-Control-Allow-Origin": "*",
-        },
-        withCredentials: true,
       })
         .then(
-          (response) => {;
-            if(response.data.utilisateur[0].evenementsCrees[0].length > 0){
-              console.log('1----'+this.listeEvenements);
+          (response) => {
+            if (response.data.utilisateur[0].evenementsCrees[0].length > 0) {
               console.log("Il y a des évenements");
               //response.data.utilisateur[0].evenementsCrees[0][0].evenementCree
-              this.listeEvenements = response.data.utilisateur[0].evenementsCrees[0];
-              for(var i=0; i<response.data.utilisateur[0].evenementsCrees[0].length; i++){
-                this.listeEvenements[i] = response.data.utilisateur[0].evenementsCrees[0][i].evenementCree;
+              this.listeEvenements =
+                response.data.utilisateur[0].evenementsCrees[0];
+              for (
+                var i = 0;
+                i < response.data.utilisateur[0].evenementsCrees[0].length;
+                i++
+              ) {
+                this.listeEvenements[i] =
+                  response.data.utilisateur[0].evenementsCrees[0][
+                    i
+                  ].evenementCree;
+
+               console.log("adentro "+this.listeEvenements);
               }
-            }else{
+
+               console.log("afuera "+this.listeEvenements);
+            } else {
               console.log("Il y a pas des évenements");
               this.listeEvenements = [];
-              document.getElementById('messageVideE').style.display = "block";
+              document.getElementById("messageVideE").style.display = "block";
             }
-          
           },
           function(err) {
             //throw new Error("end of pagination");
@@ -568,7 +614,71 @@ export default {
         });
     },
 
+    unEvenement(id) {
+      api
+        .get("http://localhost:8080/evenements/" + id)
+        .then((response) => {
+          console.log("AFFICHER UN EVENEMENT");
+          this.totalParticipants =
+            response.data.evenement[0].participants.count +
+            (this.totalParticipants =
+              response.data.evenement[0].participantsNonInscrits.count);
+          this.titreModal = response.data.evenement[0].titre;
+          this.descriptionModal = response.data.evenement[0].description;
+          this.dateModal = response.data.evenement[0].date;
+          this.heureModal = response.data.evenement[0].heure;
+          this.latitudeModal = response.data.evenement[0].latitude;
+          this.longitudeModal = response.data.evenement[0].longitude;
+          this.adresseModal = response.data.evenement[0].adresse;
+          this.codePostalModal = response.data.evenement[0].codePostal;
+          this.villeModal = response.data.evenement[0].ville;
+          this.paysModal = response.data.evenement[0].pays;
+          this.typeModal = response.data.evenement[0].type;
+
+          this.idEvenement = id;
+        })
+        .catch((error) => {
+          console.log("Error ========>", error);
+        });
+    },
+    
+    modifierEvenement(id) {
+      if (this.motpasse == this.motpassev) {
+        const config = {
+          headers: { Authorization: `Bearer ${this.token}` },
+        };
+        axios
+          .put(
+            "http://localhost:8080/evenements/" + this.idEvenement,
+            {
+            titre: this.titreModal,
+            description: this.descriptionModal,
+            date: this.dateModal,
+            heure: this.heureModal,
+            latitude: "222.31",
+            longitude: "133.2",
+            adresse: this.adresseModal,
+            codePostal: this.codePostalModal,
+            ville: this.villeModal,
+            pays: this.paysModal,
+            type: this.typeModal,
+            },
+            config
+          )
+          .then((response) => {
+            console.log(response.data);
+            this.$router.push("/successme");
+          })
+          .catch((error) => {
+            this.$router.push("/errorme");
+            console.log("Error ========>", error);
+          });
+      } else {
+        document.getElementById('messageError').style.display = "block";
+      }
+    },
     seDeconnecter() {
+      this.$store.commit("setMembre", "");
       this.$router.push("/");
     },
 
@@ -615,7 +725,7 @@ export default {
   font-family: "Raleway", sans-serif;
 }
 
-#messageVideE{
+#messageVideE {
   text-align: center;
   font-size: 1.2em;
   display: none;

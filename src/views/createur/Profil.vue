@@ -192,6 +192,7 @@ export default {
       }
     },
     seDeconnecter() {
+      this.$store.commit('setMembre', '');
       this.$router.push("/");
     },
 

@@ -202,6 +202,7 @@ export default {
   mounted() {},
   methods: {
     seDeconnecter() {
+      this.$store.commit('setMembre', '');
       this.$router.push("/");
     },
 

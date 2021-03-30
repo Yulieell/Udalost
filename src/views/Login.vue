@@ -95,7 +95,7 @@ export default {
     };
   },
   mounted() {
-    //this.test();
+    this.test();
     const signUpButton = document.getElementById("signUp");
     const signInButton = document.getElementById("signIn");
     const container = document.getElementById("container");
@@ -110,9 +110,6 @@ export default {
   },
   methods: {
     seConnecter() {
-      const data = new URLSearchParams();
-      data.append("grant_type", "client_credentials");
-
       axios({
         url: `http://localhost:8080/connexion`,
         method: "POST",
@@ -120,20 +117,14 @@ export default {
           username: this.emailL,
           password: this.motpasseL,
         },
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Access-Control-Allow-Origin": "*",
-        },
-        withCredentials: true,
       })
         .then(
           (response) => {
-            if(this.emailL == 'admin@admin.com'){
+            if (this.emailL == "admin@admin.com") {
               this.$store.commit("setAdmin", response.data);
               console.log("Admin");
               this.$router.push("/loadingadmin");
-            }else{
+            } else {
               this.$store.commit("setMembre", response.data);
               console.log("user");
               this.$router.push("/loading");
@@ -152,24 +143,14 @@ export default {
     },
 
     creerCompte() {
-      const data = new URLSearchParams();
-      data.append("grant_type", "client_credentials");
-
       if (this.motpasse == this.motpassev) {
         axios
-          .post("http://localhost:8080/utilisateurs", {
+          .post("utilisateurs", {
             username: this.username,
             nom: this.nom,
             prenom: this.prenom,
             email: this.email,
             motpasse: this.motpasse,
-            headers: {
-              Accept: "application/json",
-              "Accept-Language": "en_US",
-              "Content-Type": "application/x-www-form-urlencoded",
-              "Access-Control-Allow-Origin": "http://localhost:8080/",
-            },
-            withCredentials: true,
           })
           .then((response) => {
             this.$router.push("/successcc");
@@ -184,8 +165,8 @@ export default {
     },
 
     test() {
-      axios
-        .get("http://localhost:8080/utilisateurs")
+      api
+        .get("utilisateurs")
         .then((response) => {
           console.log(response);
         })

@@ -12,8 +12,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import axios from 'axios';
 
 window.api = axios.create({
-  baseURL: "https://docketu.iutnc.univ-lorraine.fr:10643/",
-  withCredentials: true,
+  baseURL: "https://api.udalost.web:10243/"
 });
 
 axios.interceptors.response.use(function (response) {
