@@ -95,7 +95,7 @@ export default {
     };
   },
   mounted() {
-    this.test();
+    //this.test();
     const signUpButton = document.getElementById("signUp");
     const signInButton = document.getElementById("signIn");
     const container = document.getElementById("container");
@@ -122,11 +122,9 @@ export default {
           (response) => {
             if (this.emailL == "admin@admin.com") {
               this.$store.commit("setAdmin", response.data);
-              console.log("Admin");
               this.$router.push("/loadingadmin");
             } else {
               this.$store.commit("setMembre", response.data);
-              console.log("user");
               this.$router.push("/loading");
             }
           },
@@ -164,7 +162,7 @@ export default {
       }
     },
 
-    test() {
+    /*test() {
       api
         .get("utilisateurs")
         .then((response) => {
@@ -173,7 +171,7 @@ export default {
         .catch((error) => {
           console.log("Error ========>", error);
         });
-    },
+    },*/
   },
 };
 </script>

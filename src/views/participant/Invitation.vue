@@ -5,22 +5,9 @@
         <!--MENU ORDINATEUR-->
         <div id="menu">
           <ul>
-            <li class="column">
-              <a @click="accueil" accesskey="1" title="">Accueil</a>
-            </li>
-            <li>
-              <a @click="evenement" class="column" accesskey="2" title=""
-                >Évenement</a
-              >
-            </li>
             <li class="active">
-              <a @click="profil" class="column" accesskey="4" title=""
-                >Profil</a
-              >
-            </li>
-            <li>
               <a @click="seDeconnecter" class="column" accesskey="5" title=""
-                >Se déconnecter</a
+                >Se connecter</a
               >
             </li>
           </ul>
@@ -40,10 +27,9 @@
 
             <b-collapse id="navbar-toggle-collapse" is-nav>
               <b-navbar-nav class="">
-                <b-nav-item @click="accueil" href="#">Accueil</b-nav-item>
-                <b-nav-item @click="evenement">Évenement</b-nav-item>
-                <b-nav-item class="active" @click="profil">Profil</b-nav-item>
-                <b-nav-item @click="seDeconnecter">Se déconnecter</b-nav-item>
+                <b-nav-item class="active" @click="seDeconnecter"
+                  >Se déconnecter</b-nav-item
+                >
               </b-navbar-nav>
             </b-collapse>
           </b-navbar>
@@ -53,67 +39,140 @@
     </div>
 
     <div id="wrapper">
-      <div class="form">
-        <div class="title">
-          <span>ÉVENEMENT "RENDEZ-VOUS STAGES"</span>
-        </div>
-        <h5
-          style="
+      <div class="form" id="modal__contentVisualiserEv">
+        <form class="ui form" @submit.prevent="rejoindreEvenement">
+          <div
+            class="ui small basic icon buttons column ui stackable three column grid"
+            style="margin:0px !important; float:right; width:20%; padding:0px !important;"
+            id="iconsModal"
+          >
+            <a class="ui button column">
+              État : En attente
+              <i class="clock grey icon"></i>
+            </a>
+          </div>
+          <div id="champUser">
+            <div class="field">
+              <div class="field">
+                <label><span style="color:red;">* </span>Nom</label>
+                <input type="text" name="" v-model="nom" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field">
+                <label><span style="color:red;">* </span>Message</label>
+                <textarea rows="4" v-model="message" required></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="title">
+            <span>ÉVENEMENT "RENDEZ-VOUS STAGES"</span>
+          </div>
+          <h5
+            style="
 								margin-top: 0%;
 								margin-bottom: 2%;
 								text-align: center;
                 font-size:1.1em;
 							"
-        >
-          <i class="user circle icon"></i>Vous trouverez ci-dessous vos
-          informations enregistrées lors de la création de votre compte, vous
-          pouvez les modifier à tout moment.
-        </h5>
+          >
+            <i class="user circle icon"></i>Vous trouverez ci-dessous vos
+            informations enregistrées lors de la création de votre compte, vous
+            pouvez les modifier à tout moment.
+          </h5>
 
-        <form class="ui form" @submit.prevent="modifierProfil">
           <div class="field">
             <div class="field">
-              <label><i class="address book icon"></i>Username</label>
-              <input type="text" name="" v-model="username" required />
-            </div>
-          </div>
-
-          <div class="two fields">
-            <div class="field">
-              <label><i class="address card icon"></i>Nom</label>
-              <input type="text" name="" v-model="nom" required />
-            </div>
-            <div class="field">
-              <label><i class="address card icon"></i>Prénom</label>
-              <input type="text" name="" v-model="prenom" required />
+              <label><i class="quote left icon"></i>Titre</label>
+              <input
+                type="text"
+                name=""
+                v-model="titreModal"
+                readonly="readonly"
+              />
             </div>
           </div>
 
           <div class="field">
             <div class="field">
-              <label><i class="envelope icon"></i>Email</label>
-              <input type="email" v-model="email" required />
+              <label><i class="align justify icon"></i>Description</label>
+              <textarea
+                rows="2"
+                v-model="descriptionModal"
+                readonly="readonly"
+              ></textarea>
             </div>
           </div>
-          <br><br>
-          <span>Pour des raisons de sécurité, vous devez saisir un mot de passe chaque fois que vous souhaitez modifier vos informations personnelles.</span>
-          <br>
-          <br>
-          <div class="two fields">
+
+          <div class="field">
+            <div class="fields">
+              <div class="twelve wide field">
+                <label><i class="calendar alternate icon"></i>Date</label>
+                <input type="date" v-model="dateModal" readonly="readonly" />
+              </div>
+              <div class="four wide field">
+                <label><i class="clock icon"></i>Heure</label>
+                <input
+                  type="time"
+                  v-model="heureModal"
+                  name=""
+                  readonly="readonly"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
             <div class="field">
-              <label><i class="lock icon"></i>Mot de passe</label>
-              <input type="password" name="" v-model="motpasse" required />
+              <label><i class="map marker alternate icon"></i>Adresse</label>
+              <input type="text" v-model="adresseModal" readonly="readonly" />
+            </div>
+          </div>
+
+          <div class="three fields">
+            <div class="field">
+              <label><i class="address book icon"></i>Code postal</label>
+              <input
+                type="text"
+                name=""
+                v-model="codePostalModal"
+                readonly="readonly"
+              />
             </div>
             <div class="field">
-              <label><i class="lock icon"></i>Vérifier mot de passe</label>
-              <input type="password" name="" v-model="motpassev" required />
+              <label><i class="building icon"></i>Ville</label>
+              <input
+                type="text"
+                name=""
+                v-model="villeModal"
+                readonly="readonly"
+              />
+            </div>
+            <div class="field">
+              <label><i class="flag icon"></i>Pays</label>
+              <input
+                type="text"
+                name=""
+                v-model="paysModal"
+                readonly="readonly"
+              />
             </div>
           </div>
-          <div id="messageError">
-            <span>Les mots de passe ne sont pas identiques</span>
-          </div>
-          <div id="button" class="ui button" tabindex="0">
-            <button id="green">MODIFIER</button>
+          <div class="two fields" id="buttonOptions">
+            <div class="field">
+              <div id="button" class="ui button" tabindex="0">
+                <button id="green" @click="optionResponse(true)">
+                  ACCEPTER
+                </button>
+              </div>
+            </div>
+            <div class="field">
+              <div id="button" class="ui button" tabindex="0">
+                <button id="red" @click="optionResponse(false)">REFUSER</button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
@@ -141,76 +200,102 @@ export default {
   },
   data() {
     return {
-      token: this.$store.state.membre.token,
-      id: this.$store.state.membre.utilisateur.id,
-      prenom: this.$store.state.membre.utilisateur.prenom,
-      nom: this.$store.state.membre.utilisateur.nom,
-      username: this.$store.state.membre.utilisateur.username,
-      email: this.$store.state.membre.utilisateur.email,
-      //motpasse: this.$store.state.membre.utilisateur.motpasse,
-      motpasse: "",
-      motpassev: "",
+      id: this.$route.params.id,
+      nom: "",
+      message: "",
+      status: "",
+      token: null,
+      titreModal: "",
+      descriptionModal: "",
+      dateModal: "",
+      heureModal: "",
+      latitudeModal: "",
+      longitudeModal: "",
+      adresseModal: "",
+      codePostalModal: "",
+      villeModal: "",
+      paysModal: "",
+      typeModal: "",
+      totalParticipants: "",
+      token: null,
+      res: true,
     };
   },
   mounted() {
+    this.$store.commit("setInvitation", "Je suis un invité");
+    this.unEvenement();
   },
   methods: {
-    modifierProfil() {
-      if (this.motpasse == this.motpassev) {
-        const config = {
-          headers: { Authorization: `Bearer ${this.token}` },
-        };
-        axios
-          .put(
-            "http://localhost:8080/utilisateurs/" + this.id,
-            {
-              prenom: this.prenom,
-              nom: this.nom,
-              username: this.username,
-              email: this.email,
-              motpasse: this.motpasse,
-            },
-            config
-          )
-          .then((response) => {
-            this.$store.state.membre.utilisateur.prenom = this.prenom;
-            this.$store.state.membre.utilisateur.nom = this.nom;
-            this.$store.state.membre.utilisateur.username = this.username;
-            this.$store.state.membre.utilisateur.email = this.email;
-            this.$store.state.membre.utilisateur.motpasse = this.motpasse;
-
-            this.$router.push("/successmp");
-          })
-          .catch((error) => {
-            this.$router.push("/errormp");
-            console.log("Error ========>", error);
-          });
-      } else {
-        document.getElementById('messageError').style.display = "block";
-      }
-    },
     seDeconnecter() {
-      this.$store.commit('setMembre', '');
+      this.$store.commit("setInvitation", "");
       this.$router.push("/");
     },
 
-    accueil() {
-      this.$router.push("/home");
+    rejoindreEvenement() {
+      var bearertoken = "Bearer " + this.token;
+
+      const config = {
+          headers:  null ,
+      };
+
+      if (this.res == true) {
+        this.status = 2;
+      } else if (this.res == false) {
+        this.status = 1;
+      }
+
+      if (bearertoken == "Bearer null") {
+        axios
+          .put("http://localhost:8080/evenements/" + this.id + "/rejoindre", {
+            nom: this.nom,
+            status: this.status,
+            message: this.message,
+          },config)
+          .then((response) => {
+            if (this.status == 2) {
+              this.$router.push("/acepteInvitation");
+            } else {
+              this.$router.push("/refuseInvitation");
+            }
+          })
+          .catch((error) => {
+            console.log("Error ========>", error);
+          });
+      } else {
+      }
     },
 
-    evenement() {
-      this.$router.push("/evenement");
+    unEvenement() {
+      api
+        .get("http://localhost:8080/evenements/" + this.id)
+        .then((response) => {
+          this.totalParticipants =
+            response.data.evenement[0].participants.count +
+            (this.totalParticipants =
+              response.data.evenement[0].participantsNonInscrits.count);
+          this.titreModal = response.data.evenement[0].titre;
+          this.descriptionModal = response.data.evenement[0].description;
+          this.dateModal = response.data.evenement[0].date;
+          this.heureModal = response.data.evenement[0].heure;
+          this.latitudeModal = response.data.evenement[0].latitude;
+          this.longitudeModal = response.data.evenement[0].longitude;
+          this.adresseModal = response.data.evenement[0].adresse;
+          this.codePostalModal = response.data.evenement[0].codePostal;
+          this.villeModal = response.data.evenement[0].ville;
+          this.paysModal = response.data.evenement[0].pays;
+          this.typeModal = response.data.evenement[0].type;
+        })
+        .catch((error) => {
+          console.log("Error ========>", error);
+        });
     },
 
-    profil() {
-      this.$router.push("/profil");
-    },
-    invitation() {
-      this.$router.push("/invitation");
-    },
-
-    evenementPublic() {
-      this.$router.push("/evenementPublic");
+    optionResponse(x) {
+      if (x == true) {
+        this.res = true;
+      } else {
+        this.res = false;
+      }
     },
   },
 };
@@ -225,7 +310,7 @@ export default {
   font-family: "Raleway", sans-serif;
 }
 
-#messageError{
+#messageError {
   text-align: center;
   color: red;
   display: none;
@@ -391,7 +476,6 @@ a:hover {
 
 #wrapper {
   width: 100% !important;
-  padding: 4em 0em 0em 0em;
   background: #fff;
 }
 
@@ -405,13 +489,11 @@ a:hover {
 /*********************************************************************************/
 
 #header-wrapper {
-  position: relative;
   background: rgb(48, 48, 78);
   background-size: cover;
 }
 
 #header {
-  position: relative;
   padding: 5em 0em;
 }
 
@@ -434,7 +516,7 @@ a:hover {
   position: absolute;
   top: 4.5em;
   right: 0;
-  margin-right: 0%;
+  margin-right: 5%;
   display: "";
 }
 
@@ -704,7 +786,8 @@ $transition: 0.3s ease-out all;
   width: 100%;
   padding: 2%;
 
-  input {
+  input,
+  textarea {
     background-color: #30303015 !important;
     height: 4vh;
     border: none;
@@ -737,18 +820,51 @@ $transition: 0.3s ease-out all;
 
     & button {
       border-radius: 100px;
-      width: 40%;
+      width: 100%;
       height: 5vh;
       border: none !important;
       background-color: rgb(48, 48, 78);
       color: white;
       cursor: pointer;
 
-      &:hover {
-        border: none !important;
-        background-color: rgb(19, 19, 32);
-        transition: 0.5s;
+      &#green {
+        background-color: green;
+
+        &:hover {
+          border: none !important;
+          background-color: rgb(4, 95, 4);
+          transition: 0.5s;
+        }
       }
+
+      &#red {
+        background-color: rgb(173, 2, 2);
+
+        &:hover {
+          border: none !important;
+          background-color: rgb(110, 0, 0);
+          transition: 0.5s;
+        }
+      }
+    }
+  }
+}
+
+#buttonOptions {
+  width: 100%;
+}
+
+#champUser {
+  margin-bottom: 5%;
+  input,
+  textarea {
+    background-color: #a6d0f479 !important;
+    height: 4vh;
+    border: none;
+
+    &:hover {
+      background-color: #a6d0f42d;
+      border: 1px solid #a6d0f42d;
     }
   }
 }

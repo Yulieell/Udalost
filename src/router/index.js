@@ -75,6 +75,11 @@ const routes = [
     component: () => import('../views/Animations/ErrorEvCreer.vue')
   },
   {
+    path: '/invitationevenement/:id',
+    name: 'invitationevenement',
+    component: () => import('../views/participant/Invitation.vue')
+  },
+  {
     path: '/gestionEvenement',
     name: 'gestionEvenement',
     component: () => import( '../views/gestionnaire/GestionEvenement.vue')
@@ -83,7 +88,14 @@ const routes = [
     path: '/gestionCompte',
     name: 'gestionCompte',
     component: () => import( '../views/gestionnaire/GestionCompte.vue')
+  },{
+  path: '/acepteInvitation',
+  component: () => import('../views/Animations/AccepterInvitation.vue')
   },
+  {
+  path: '/refuseInvitation',
+  component: () => import('../views/Animations/RefuserInvitation.vue')
+},
 ]
 
 const router = new VueRouter({
@@ -91,5 +103,6 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
 
 export default router

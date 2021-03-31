@@ -13,12 +13,20 @@ export default new Vuex.Store({
     membre:false,
     admin:false,
     token:false,
+    invitation: false,
+    geo: false,
     conversations: [],
     membres: []
   },
   mutations: {
     setMembre(state, membre){
       state.membre = membre;
+    },
+    setInvitation(state, invitation){
+      state.invitation = invitation;
+    },
+    setGeo(state, geo){
+      state.geo = geo;
     },
     setAdmin(state, admin){
       state.admin = admin;
