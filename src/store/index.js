@@ -25,9 +25,6 @@ export default new Vuex.Store({
     setInvitation(state, invitation){
       state.invitation = invitation;
     },
-    setGeo(state, geo){
-      state.geo = geo;
-    },
     setAdmin(state, admin){
       state.admin = admin;
     },

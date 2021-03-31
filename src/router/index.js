@@ -39,8 +39,20 @@ const routes = [
     component: () => import('../views/createur/EvenementPublic.vue')
   },
   {
-    path: '/participant',
+    path: '/participant/:id',
     component: () => import('../views/createur/Participant.vue')
+  },
+  {
+    path: '/participanttous/:id',
+    component: () => import('../views/createur/Participant.vue')
+  },
+  {
+    path: '/participantaccepte/:id',
+    component: () => import('../views/createur/ParticipantAccepte.vue')
+  },
+  {
+    path: '/participantrefuse/:id',
+    component: () => import('../views/createur/ParticipantRefuse.vue')
   },
   {
     path: '/successcc',
@@ -95,6 +107,14 @@ const routes = [
   {
   path: '/refuseInvitation',
   component: () => import('../views/Animations/RefuserInvitation.vue')
+  },
+  {
+  path: '/acepteInvitationAuth',
+  component: () => import('../views/Animations/AccepterInvitationAuth.vue')
+  },
+  {
+  path: '/refuseInvitationAuth',
+  component: () => import('../views/Animations/RefuserInvitationAuth.vue')
 },
 ]
 

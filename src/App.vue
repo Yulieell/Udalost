@@ -17,7 +17,6 @@ export default {
       ) {
         this.$router.push("/");
       }
-
       /*if (
         (this.$store.state.invitation != null ||
         this.$store.state.invitation) && (this.$store.state.membre == null || !this.$store.state.membre)

@@ -243,7 +243,7 @@
             <i class="reply icon"></i> Retourner
           </a>
           <div class="title">
-            <span>GÉOLOCALISATION DE "RENDEZ-VOUS STAGES"</span>
+            <span>GÉOLOCALISATION DE "{{ titreModal }}"</span>
           </div>
           <form>
             <div id="map-example-container"></div>
@@ -268,16 +268,16 @@
           <div class="title">
             <span>ÉVENEMENT "{{ titreModal }}"</span>
           </div>
-
+          <!-- hidden="hidden"-->
           <button hidden="hidden" id="link">{{ link }}</button>
 
-          <form class="ui form" @submit.prevent="modifierEvenement">
+          <form class="ui form" @submit.prevent="geoMapChanger">
             <div
               class="ui small basic icon buttons column ui stackable four column grid"
               style="margin:0px !important; float:right; width:50%; padding:0px !important;"
               id="iconsModal"
             >
-              <a class="ui button column" @click="participant">
+              <a class="ui button column" @click="participant" >
                 <i class="large purple users alternate icon"></i>
                 {{ totalParticipants }} participants
               </a>
@@ -456,7 +456,7 @@ export default {
       const params = {
         address: adresse,
         sensor: false,
-        key: "fc0786cbe56423b6ad6be200da5fdda1",
+        key: "19faec5f103a75f97020ea531ea19864",
       };
 
       map
@@ -469,6 +469,39 @@ export default {
           console.log(lon);
           console.log(lat);
           this.creerEvenement(lat, lon);
+        })
+        .catch((error) => {
+          console.log("Error with maps========>", error);
+        });
+    },
+
+    geoMapChanger() {
+
+       var adresse =
+          this.adresseModal +
+          ", " +
+          this.villeModal +
+          ", " +
+          this.paysModal +
+          ", " +
+          this.codePostalModal;
+
+      const params = {
+        address: adresse,
+        sensor: false,
+        key: "19faec5f103a75f97020ea531ea19864",
+      };
+
+      map
+        .get("api/geocoding/", { params })
+        .then((response) => {
+          var lon,
+            lat = "";
+          lon = response.data.results[0].geometry.location.lng;
+          lat = response.data.results[0].geometry.location.lat;
+          console.log(lon);
+          console.log(lat);
+          this.modifierEvenement(lat, lon);
         })
         .catch((error) => {
           console.log("Error with maps========>", error);
@@ -516,11 +549,12 @@ export default {
       const config = {
         headers: { Authorization: `Bearer ${this.token}` },
       };
+    
       axios
         .put(
           "http://localhost:8080/evenements/" + id + "/rejoindre",
           {
-            nom: "",
+            nom: this.$store.state.membre.utilisateur.nom+' '+this.$store.state.membre.utilisateur.prenom,
             status: "2",
             message: "Bonjour, je suis le createur",
           },
@@ -548,10 +582,6 @@ export default {
                 i < response.data.utilisateur[0].evenementsCrees[0].length;
                 i++
               ) {
-                console.log(
-                  response.data.utilisateur[0].evenementsCrees[0][i]
-                    .evenementCree
-                );
                 this.listeEvenements[i] =
                   response.data.utilisateur[0].evenementsCrees[0][
                     i
@@ -576,6 +606,7 @@ export default {
       api
         .get("http://localhost:8080/evenements/" + id)
         .then((response) => {
+          this.link = "http://localhost:8080/invitationevenement/" + response.data.evenement[0].id;
           this.totalParticipants =
             response.data.evenement[0].participants.count +
             (this.totalParticipants =
@@ -592,22 +623,19 @@ export default {
           this.paysModal = response.data.evenement[0].pays;
           this.typeModal = response.data.evenement[0].type;
 
-          this.idEvenement = id;
+          this.idEvenement = response.data.evenement[0].id;
 
           this.geolocation(
             response.data.evenement[0].latitude,
             response.data.evenement[0].longitude
           );
-
-          this.link =
-            "http://localhost:8080/invitationevenement/" + this.idEvenement;
         })
         .catch((error) => {
           console.log("Error ========>", error);
         });
     },
 
-    modifierEvenement(id) {
+    modifierEvenement(lat, lon) {
       if (this.motpasse == this.motpassev) {
         const config = {
           headers: { Authorization: `Bearer ${this.token}` },
@@ -620,8 +648,8 @@ export default {
               description: this.descriptionModal,
               date: this.dateModal,
               heure: this.heureModal,
-              latitude: "222.31",
-              longitude: "133.2",
+              latitude: lat,
+              longitude: lon,
               adresse: this.adresseModal,
               codePostal: this.codePostalModal,
               ville: this.villeModal,
@@ -667,13 +695,12 @@ export default {
     },
 
     participant() {
-      this.$router.push("/participant");
+      this.$router.push("/participant/" + this.idEvenement);
     },
 
     afficherEvenement() {},
 
     geolocation(lat, lon) {
-
       console.log(lat);
       console.log(lon);
       var latlng = {
@@ -772,7 +799,6 @@ export default {
 
       function addMarker(suggestion) {
         var marker = L.marker(suggestion.latlng, { opacity: 0.4 });
-        console.log("suggestion");
         marker.bindPopup(
           "<h4>Nouvelle adresse de votre événement</h4><br><span>Les modifications seront prises en compte lorsque vous cliquez sur 'Accepter'.</span>"
         );
@@ -799,6 +825,8 @@ export default {
         container._leaflet_id = null;
         //L.map("map-example-container");
       }
+
+      this.afficherEvenementsUser();
     },
   },
 };

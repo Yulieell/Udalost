@@ -43,7 +43,7 @@
         <form class="ui form" @submit.prevent="rejoindreEvenement">
           <div
             class="ui small basic icon buttons column ui stackable three column grid"
-            style="margin:0px !important; float:right; width:20%; padding:0px !important;"
+            style="margin:0px !important; margin-bottom:5%; float:right; width:20%; padding:0px !important;"
             id="iconsModal"
           >
             <a class="ui button column">
@@ -51,8 +51,20 @@
               <i class="clock grey icon"></i>
             </a>
           </div>
+
           <div id="champUser">
-            <div class="field">
+            <div class="field" id="hidden">
+              <h5
+                style="
+								margin-top: 4%;
+								margin-bottom: 2%;
+								text-align: center;
+                font-size:1.1em;
+							"
+              >
+                <i class="arrow circle down icon"></i>Veuillez saisir votre nom
+                et un message pour le créateur de l'événement
+              </h5>
               <div class="field">
                 <label><span style="color:red;">* </span>Nom</label>
                 <input type="text" name="" v-model="nom" required />
@@ -68,7 +80,7 @@
           </div>
 
           <div class="title">
-            <span>ÉVENEMENT "RENDEZ-VOUS STAGES"</span>
+            <span>ÉVENEMENT {{ titreModal }}</span>
           </div>
           <h5
             style="
@@ -78,9 +90,8 @@
                 font-size:1.1em;
 							"
           >
-            <i class="user circle icon"></i>Vous trouverez ci-dessous vos
-            informations enregistrées lors de la création de votre compte, vous
-            pouvez les modifier à tout moment.
+            <i class="user circle icon"></i>Vous trouverez ci-dessous les
+            informations concertant l'événement
           </h5>
 
           <div class="field">
@@ -160,6 +171,46 @@
               />
             </div>
           </div>
+
+          <div id="map-example-container"></div>
+
+          <div class="ui comments" style="margin-top:6%;">
+            <h1>Commentaires</h1>
+            <div class="comment">
+              <div style="padding-bottom:3%" v-for="(com, i) in this.comments">
+                <a class="avatar">
+                  <img src="../../assets/images/users.png" />
+                </a>
+                <div class="content" style="width:100% !important">
+                  <a class="author">Utilisateur</a>
+                  <div class="metadata">
+                    <div class="date">{{ com.updated_at }}</div>
+                  </div>
+                  <div class="text" style="width:100% !important">
+                    {{ com.texte }}
+                  </div>
+                  <div class="actions">
+                    <a class="reply active">{{ com.lien }}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <form class="ui reply form" id="comments" @submit.prevent="commenter">
+            <div class="field">
+              <textarea
+                v-model="texte"
+                placeholder="Écrire un commentaire..."
+              ></textarea>
+              <input v-model="lien" type="url" placeholder="URL" />
+            </div>
+            <div id="button" class="ui button" tabindex="0">
+              <button id="green">
+                Commenter
+              </button>
+            </div>
+          </form>
+
           <div class="two fields" id="buttonOptions">
             <div class="field">
               <div id="button" class="ui button" tabindex="0">
@@ -204,7 +255,6 @@ export default {
       nom: "",
       message: "",
       status: "",
-      token: null,
       titreModal: "",
       descriptionModal: "",
       dateModal: "",
@@ -219,6 +269,11 @@ export default {
       totalParticipants: "",
       token: null,
       res: true,
+      texte: "",
+      lien: "",
+      comments: [],
+      idpar: [],
+      nomC: [],
     };
   },
   mounted() {
@@ -235,7 +290,7 @@ export default {
       var bearertoken = "Bearer " + this.token;
 
       const config = {
-          headers:  null ,
+        headers: null,
       };
 
       if (this.res == true) {
@@ -246,11 +301,15 @@ export default {
 
       if (bearertoken == "Bearer null") {
         axios
-          .put("http://localhost:8080/evenements/" + this.id + "/rejoindre", {
-            nom: this.nom,
-            status: this.status,
-            message: this.message,
-          },config)
+          .put(
+            "http://localhost:8080/evenements/" + this.id + "/rejoindre",
+            {
+              nom: this.nom,
+              status: this.status,
+              message: this.message,
+            },
+            config
+          )
           .then((response) => {
             if (this.status == 2) {
               this.$router.push("/acepteInvitation");
@@ -262,6 +321,7 @@ export default {
             console.log("Error ========>", error);
           });
       } else {
+        //this.$router.push("/home");
       }
     },
 
@@ -269,6 +329,11 @@ export default {
       api
         .get("http://localhost:8080/evenements/" + this.id)
         .then((response) => {
+          this.geolocation(
+            response.data.evenement[0].latitude,
+            response.data.evenement[0].longitude
+          );
+
           this.totalParticipants =
             response.data.evenement[0].participants.count +
             (this.totalParticipants =
@@ -284,9 +349,38 @@ export default {
           this.villeModal = response.data.evenement[0].ville;
           this.paysModal = response.data.evenement[0].pays;
           this.typeModal = response.data.evenement[0].type;
+
+          console.log("----"+ response.data.evenement[0].participants );
+          if (
+            response.data.evenement[0].participants != null ||
+            response.data.evenement[0].participantsNonInscrits  != null
+          ) {
+            this.comments =
+              response.data.evenement[0].participants[0][0].participant.commentaires;
+            this.comments =
+              response.data.evenement[0].participantsNonInscrits[0][0].participantNonInscrit.commentaires;
+          }
         })
         .catch((error) => {
           console.log("Error ========>", error);
+        });
+    },
+
+    unParticipant(id, i) {
+      axios({
+        url: `/participants/` + id,
+        method: "GET",
+      })
+        .then(
+          (response) => {
+            console.log(response.data);
+          },
+          function(err) {
+            console.log("error");
+          }
+        )
+        .catch((error) => {
+          alert("Error :" + error);
         });
     },
 
@@ -296,6 +390,73 @@ export default {
       } else {
         this.res = false;
       }
+    },
+
+    accueil() {
+      this.$router.push("/home");
+    },
+
+    evenement() {
+      this.$router.push("/evenement");
+    },
+
+    commenter() {
+      axios
+        .post("http://localhost:8080/evenements/" + this.$route.params.id + "/commentaires", {
+          id_participant: 95,
+          texte: this.texte,
+          lien: this.lien,
+        })
+        .then((response) => {
+          this.unEvenement();
+        })
+        .catch((error) => {
+          console.log("Error ========>", error);
+        });
+    },
+
+    profil() {
+      this.$router.push("/profil");
+    },
+
+    geolocation(lat, lon) {
+      console.log(lat);
+      console.log(lon);
+      var latlng = {
+        lng: lon,
+        lat: lat,
+      };
+
+      var map = "";
+
+      if (!map) {
+        map = new L.map("map-example-container", {
+          center: [latlng.lat, latlng.lng],
+          zoom: 5,
+          renderer: L.canvas(),
+          attributionControl: true,
+        });
+      }
+
+      map.setView(new L.LatLng(latlng.lat, latlng.lng), 16);
+
+      var osmLayer = new L.TileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          minZoom: 1,
+          maxZoom: 17,
+          attribution:
+            'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+        }
+      );
+
+      var markerslat = [];
+      map.addLayer(osmLayer);
+
+      var markerlat = L.marker(latlng, { opacity: 1 });
+      markerlat.bindPopup("<h3>Votre événement est là</h3>");
+      markerlat.addTo(map);
+      markerslat.push(markerlat);
     },
   },
 };
@@ -310,12 +471,50 @@ export default {
   font-family: "Raleway", sans-serif;
 }
 
+#map-example-container {
+  height: 40vh;
+}
+
+#comments {
+  width: 100% !important;
+  padding: 0% !important;
+  margin: 0% !important;
+  display: block;
+  justify-content: center;
+  text-align: center;
+
+  & div:first-of-type {
+    background: #0000000e;
+
+    textarea::placeholder {
+      color: #000000;
+    }
+    input {
+      background: wheat !important;
+
+      &::placeholder {
+        color: #000000;
+      }
+    }
+  }
+
+  & div:last-of-type {
+    width: 100%;
+
+    button {
+      background: #a6cff4 !important;
+    }
+  }
+}
+
 #messageError {
   text-align: center;
   color: red;
   display: none;
 }
-
+#cnt {
+  display: none;
+}
 a {
   cursor: pointer;
 }
@@ -517,7 +716,7 @@ a:hover {
   top: 4.5em;
   right: 0;
   margin-right: 5%;
-  display: "";
+  display: block;
 }
 
 #menu ul {
@@ -601,31 +800,6 @@ a:hover {
 #copyright a {
   text-decoration: none;
   color: rgba(0, 0, 0, 0.699);
-}
-
-/*********************************************************************************/
-/* Extra                                                                         */
-/*********************************************************************************/
-
-#three-column {
-  text-align: center;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-#three-column .fa {
-  display: block;
-  color: rgba(0, 0, 0, 1);
-  font-size: 2em;
-}
-
-#three-column .title h2 {
-  font-weight: bold;
-  color: rgba(0, 0, 0, 0.8);
-}
-
-#three-column .title .byline {
-  text-align: center;
-  color: rgba(0, 0, 0, 0.5);
 }
 
 // NAV MOBILE

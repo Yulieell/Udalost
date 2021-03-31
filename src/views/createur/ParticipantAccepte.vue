@@ -58,17 +58,16 @@
       class="ui secondary pointing menu ui stackable three column grid"
       id="submenu"
     >
-      <a class="active item column" @click="tous">
+      <a class=" item column" @click="tous">
         Tous
       </a>
-      <a class="item column" @click="participantAcepte">
+      <a class="active item column" @click="participantAcepte">
         Aceptés
       </a>
       <a class="item column" @click="participantRefuse">
         Refusés
       </a>
     </div>
-    
 
     <a class="ui button" id="retour" @click="retour">
       <i class="reply icon"></i> Retourner
@@ -100,16 +99,21 @@
         id="cardsEvenement"
         @click="afficherEvenement"
       >
-        <a href="#visualiserEvenement-modal" class="card column" id="cardDiv" v-for="(ev, i) in this.listeParticipants">
+        <a
+          href="#visualiserEvenement-modal"
+          class="card column"
+          id="cardDiv"
+          v-for="(ev, i) in this.listeParticipants"
+        >
           <div class="image" id="imageCard">
             <img src="../../assets/images/users.png" />
           </div>
           <div class="content">
-            <div class="header">{{ev.nom}}</div>
+            <div class="header">{{ ev.nom }}</div>
           </div>
           <div class="extra content" id="content">
             <span>
-              {{ev.message}}
+              {{ ev.message }}
             </span>
           </div>
         </a>
@@ -133,7 +137,7 @@ export default {
   name: "Home",
   data() {
     return {
-      listeParticipants: []
+      listeParticipants: [],
     };
   },
   components: {
@@ -168,14 +172,20 @@ export default {
             this.listeParticipants = [];
             if (response.data.participants.length > 0) {
               var count = 0;
-              for (var i = 0;i < response.data.participants.length;i++) {
-                if(response.data.participants[i].utilisateur.id_evenement == this.$route.params.id){
-                  
-                this.listeParticipants[count] = response.data.participants[i].utilisateur;  
-                count++;    
-              }
+              for (var i = 0; i < response.data.participants.length; i++) {
+                if (
+                  response.data.participants[i].utilisateur.id_evenement ==
+                  this.$route.params.id
+                ) {
+                  if (response.data.participants[i].utilisateur.status == 2) {
+                    this.listeParticipants[count] =
+                      response.data.participants[i].utilisateur;
+                    count++;
+                  }
+                }
               }
             } else {
+              console.log("Il y a pas d'utilisateurs");
             }
           },
           function(err) {
@@ -203,12 +213,12 @@ export default {
       this.$router.push("/participantaccepte/" + this.$route.params.id);
     },
 
-    tous() {
-      this.$router.push("/participant/" + this.$route.params.id);
+    participantRefuse() {
+      this.$router.push("/participantrefuse/" + this.$route.params.id);
     },
 
-     participantRefuse() {
-      this.$router.push("/participantrefuse/" + this.$route.params.id);
+    tous() {
+      this.$router.push("/participant/" + this.$route.params.id);
     },
 
     afficherEvenement() {},
