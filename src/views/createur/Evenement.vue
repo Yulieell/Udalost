@@ -691,10 +691,18 @@ export default {
         type: "address",
       });
 
-      var map = L.map("map-example-container", {
-        scrollWheelZoom: true,
-        zoomControl: true,
-      });
+      var map = "";
+
+      if (!map) {
+        map = new L.map("map-example-container", {
+          center: [latlng.lat, latlng.lng],
+          zoom: 5,
+          renderer: L.canvas(),
+          attributionControl: true,
+        });
+      }
+
+      map.setView(new L.LatLng(latlng.lat, latlng.lng), 16);
 
       var osmLayer = new L.TileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -708,8 +716,6 @@ export default {
 
       var markers = [];
       var markerslat = [];
-
-      map.setView(new L.LatLng(latlng.lat, latlng.lng), 16);
       map.addLayer(osmLayer);
 
       var markerlat = L.marker(latlng, { opacity: 1 });
@@ -787,10 +793,12 @@ export default {
     reload() {
       //location.reload();
       //this.$router.push("/home");
-          if (L.map("map-example-container") || L.map("map-example-container") != null || L.map("map-example-container") != undefined) {
-      console.log("YA EXISTIAAAA");
-      L.map("map-example-container").remove();
-    }
+      var container = L.DomUtil.get("map-example-container");
+      if (container != null) {
+        //container.outerHTML = ""; // Clear map generated HTML
+        container._leaflet_id = null;
+        //L.map("map-example-container");
+      }
     },
   },
 };
