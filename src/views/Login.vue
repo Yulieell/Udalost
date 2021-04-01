@@ -111,7 +111,7 @@ export default {
   methods: {
     seConnecter() {
       axios({
-        url: `http://localhost:8080/connexion`,
+        url: `https://udalost.netlify.app/connexion`,
         method: "POST",
         auth: {
           username: this.emailL,
@@ -145,7 +145,7 @@ export default {
     creerCompte() {
       if (this.motpasse == this.motpassev) {
         axios
-          .post("http://localhost:8080/utilisateurs", {
+          .post("https://udalost.netlify.app/utilisateurs", {
             username: this.username,
             nom: this.nom,
             prenom: this.prenom,
@@ -162,17 +162,6 @@ export default {
       } else {
         document.getElementById("messageError").style.display = "block";
       }
-    },
-
-    test() {
-      api
-        .get("utilisateurs")
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log("Error ========>", error);
-        });
     },
   },
 };
