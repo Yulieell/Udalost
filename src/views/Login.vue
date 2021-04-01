@@ -142,7 +142,7 @@ export default {
 
     creerCompte() {
       if (this.motpasse == this.motpassev) {
-        axios
+        api
           .post("utilisateurs", {
             username: this.username,
             nom: this.nom,
