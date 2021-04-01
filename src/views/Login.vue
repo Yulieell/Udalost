@@ -17,7 +17,7 @@
       </div>
       <div class="form-container sign-up-container">
         <form action="#" @submit.prevent="creerCompte">
-          <strong><h4 class="titleForm">AMOUR</h4></strong>
+          <strong><h4 class="titleForm">CRÉER COMPTE</h4></strong>
           <input
             type="text"
             v-model="username"
@@ -95,7 +95,7 @@ export default {
     };
   },
   mounted() {
-    this.test();
+    //this.test();
     const signUpButton = document.getElementById("signUp");
     const signInButton = document.getElementById("signIn");
     const container = document.getElementById("container");
@@ -110,7 +110,7 @@ export default {
   },
   methods: {
     seConnecter() {
-      api({
+      axios({
         url: `connexion`,
         method: "POST",
         auth: {
@@ -122,11 +122,9 @@ export default {
           (response) => {
             if (this.emailL == "admin@admin.com") {
               this.$store.commit("setAdmin", response.data);
-              console.log("Admin");
               this.$router.push("/loadingadmin");
             } else {
               this.$store.commit("setMembre", response.data);
-              console.log("user");
               this.$router.push("/loading");
             }
           },
@@ -145,7 +143,7 @@ export default {
     creerCompte() {
       if (this.motpasse == this.motpassev) {
         axios
-          .post("https://udalost.netlify.app/utilisateurs", {
+          .post("utilisateurs", {
             username: this.username,
             nom: this.nom,
             prenom: this.prenom,
@@ -153,11 +151,9 @@ export default {
             motpasse: this.motpasse,
           })
           .then((response) => {
-            console.log('CRRER COIMPTE');
             this.$router.push("/successcc");
           })
           .catch((error) => {
-            console.log('PAS CRRER COIMPTE');
             console.log("Error ========>", error);
             this.$router.push("/errorcc");
           });
@@ -166,16 +162,16 @@ export default {
       }
     },
 
-    test() {
-      axios
-        .get("https://udalost.netlify.app/utilisateurs")
+    /*test() {
+      api
+        .get("utilisateurs")
         .then((response) => {
           console.log(response);
         })
         .catch((error) => {
           console.log("Error ========>", error);
         });
-    },
+    },*/
   },
 };
 </script>
