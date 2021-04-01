@@ -110,7 +110,7 @@ export default {
   },
   methods: {
     seConnecter() {
-      axios({
+      api({
         url: `connexion`,
         method: "POST",
         auth: {
@@ -144,8 +144,8 @@ export default {
 
     creerCompte() {
       if (this.motpasse == this.motpassev) {
-        axios
-          .post("https://udalost.netlify.app/utilisateurs", {
+        api
+          .post("utilisateurs", {
             username: this.username,
             nom: this.nom,
             prenom: this.prenom,
