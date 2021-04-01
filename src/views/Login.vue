@@ -17,7 +17,7 @@
       </div>
       <div class="form-container sign-up-container">
         <form action="#" @submit.prevent="creerCompte">
-          <strong><h4 class="titleForm">AAAAA</h4></strong>
+          <strong><h4 class="titleForm">CRÉER COMPTE</h4></strong>
           <input
             type="text"
             v-model="username"
@@ -162,6 +162,17 @@ export default {
       } else {
         document.getElementById("messageError").style.display = "block";
       }
+    },
+
+    test() {
+      api
+        .get("utilisateurs")
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log("Error ========>", error);
+        });
     },
   },
 };
