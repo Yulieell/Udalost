@@ -167,8 +167,8 @@ export default {
     },
 
     test() {
-      api
-        .get("utilisateurs")
+      axios
+        .get("https://udalost.netlify.app/utilisateurs")
         .then((response) => {
           console.log(response);
         })
