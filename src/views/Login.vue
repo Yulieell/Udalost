@@ -144,8 +144,8 @@ export default {
 
     creerCompte() {
       if (this.motpasse == this.motpassev) {
-        api
-          .post("utilisateurs", {
+        axios
+          .post("https://udalost.netlify.app/utilisateurs", {
             username: this.username,
             nom: this.nom,
             prenom: this.prenom,
