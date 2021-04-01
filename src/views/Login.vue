@@ -17,7 +17,7 @@
       </div>
       <div class="form-container sign-up-container">
         <form action="#" @submit.prevent="creerCompte">
-          <strong><h4 class="titleForm">CRÉER COMPTE</h4></strong>
+          <strong><h4 class="titleForm">AMOUR</h4></strong>
           <input
             type="text"
             v-model="username"
@@ -111,7 +111,7 @@ export default {
   methods: {
     seConnecter() {
       axios({
-        url: `https://udalost.netlify.app/connexion`,
+        url: `connexion`,
         method: "POST",
         auth: {
           username: this.emailL,
@@ -153,9 +153,11 @@ export default {
             motpasse: this.motpasse,
           })
           .then((response) => {
+            console.log('CRRER COIMPTE');
             this.$router.push("/successcc");
           })
           .catch((error) => {
+            console.log('PAS CRRER COIMPTE');
             console.log("Error ========>", error);
             this.$router.push("/errorcc");
           });
